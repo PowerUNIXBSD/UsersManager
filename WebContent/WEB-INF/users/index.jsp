@@ -57,12 +57,9 @@
 			<c:forEach var="user" items="${users}">
 				<tr>
 					<td>
-					
-      
-						<input type="checkbox" id="du${ user.getId() }" name="du" value="${ user.getId() }">
+						<input type="checkbox" class="userDeleteCheckBox" id="du${ user.getId() }" name="du" value="${ user.getId() }">
 						<label for="du${ user.getId() }"><a href='<c:url value="/UsersServlet?action=details&id=${ user.getId() }"  />'>${ user.getFirstName() }
 							${ user.getLastName() } </a></label>
-						
 					</td>
 					
 					<td> ${ user.getDateBirth() } </td>
@@ -76,12 +73,11 @@
 		</table>
 	
 		<div class="center-align">
-			<button class="btn marginH10 orange">Add new user</button>
-			<button class="btn marginH10 orange lighten-5 orange-text">Select</button>
-			<button class="btn marginH10 orange lighten-5 orange-text">Select all</button>
-			<input type="submit" onclick="return confirm('Do you want to delete selected users?')" class="btn marginH10 orange lighten-5 orange-text" value="Delete selected users">
+			<a href="<c:url value="/UsersServlet?action=details" />"><div class="btn marginH10 orange">Add new user</div></a>
+			<div id="selectAllBtn" class="btn marginH10 orange lighten-5 orange-text">Select all</div>
+			<input type="submit" name="action" value="delete" onclick="return confirm('Do you want to delete selected users?')" class="btn marginH10 orange lighten-5 orange-text" value="Delete selected users">
 		</div>
-		<input type="hidden" name="action" value="delete">
+		
 	</form>
 	
 	

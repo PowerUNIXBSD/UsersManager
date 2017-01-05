@@ -17,6 +17,10 @@
 	margin-right: 10px;
 }
 
+.hidden {
+	display: none;	
+}
+
 .breadcrumb.orange-text:HOVER {
 	background-color: #ffe0b2;
 }

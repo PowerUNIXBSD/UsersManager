@@ -1,7 +1,7 @@
 package com.MarkovskiSolutions.Servlets;
 
 import java.io.IOException;
-
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -11,6 +11,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.StringJoiner;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -86,16 +89,11 @@ public class UsersServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		if (request.getParameter("action") != null) {
+			
 			if (request.getParameter("action").equals("details")) {
 				showDetails(request, response);
 			} else if (request.getParameter("action").equals("delete")) {
-				String[] usersForDelete = request.getParameterValues("du");
-				
-			
-				
-					response.getWriter().write(String.join(", ", usersForDelete));
-				
-				
+				deleteUsers(request, response);
 			}
 			
 		} else {
@@ -103,6 +101,48 @@ public class UsersServlet extends HttpServlet {
 		}
 
 
+	}
+
+	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	private void deleteUsers(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		String[] usersForDeleteString = request.getParameterValues("du");
+		
+		StringJoiner ids = new StringJoiner(", ");
+		if (usersForDeleteString != null) {
+			
+		
+			for (String sid : usersForDeleteString) {
+				try {
+					
+					int id = Integer.valueOf(sid);
+					
+					if (id != 0) {
+						ids.add(String.valueOf(id));
+					}
+					
+				} catch (NumberFormatException ex) {
+					// Skip non-numeric values
+				}
+			}
+			
+			final String sql = "DELETE FROM users WHERE id in (" + ids + ")";
+			try {
+				Statement stmt = con.createStatement();
+				response.getWriter().write(sql);
+				/*stmt.executeUpdate(sql);
+				response.sendRedirect("/UserManagementWebApplication/UsersServlet");*/
+			} catch (SQLException e) {
+				ErrorPage.showError(request, response, e);
+			}
+		} else {
+			response.sendRedirect("/UserManagementWebApplication/UsersServlet");
+		}
 	}
 
 	/**
