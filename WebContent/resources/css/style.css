@@ -1,0 +1,44 @@
+@CHARSET "UTF-8";
+
+.marginTop20 {
+	margin-top: 20px;
+}
+
+.marginBottom20 {
+	margin-bottom: 20px;
+}
+
+.padding20 {
+	padding: 20px;
+}
+
+.marginH10 {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.breadcrumb.orange-text:HOVER {
+	background-color: #ffe0b2;
+}
+
+.search { 
+	max-width: calc(100% - 56px) !important;	
+}
+
+.active, .validate {
+	/* color: orange; */
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #ff9800;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #ff9800;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #ff9800;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #ff9800;
+}
+
