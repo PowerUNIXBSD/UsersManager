@@ -10,7 +10,7 @@
 	<nav class="marginTop20 marginBottom20 orange lighten-3 z-depth-0">
 		<div class="nav-wrapper ">
 			<div class="col s12">
-				<a href="/UserManagementWebApplication/UsersServlet"
+				<a href="users"
 					class="breadcrumb padding20 orange-text">Users</a> <a href="#!"
 					class="breadcrumb padding20"> 
 						<c:if test="${ user.getId() != 0 }">Update</c:if>
@@ -25,8 +25,7 @@
 	</div>
 
 	<div class="row">
-		<form class="col s12" method="post"
-			action="/UserManagementWebApplication/UsersServlet">
+		<form class="col s12" method="post">
 			<div class="row">
 				<div class="input-field col s6">
 					<input id="FirstName" name="FirstName"
@@ -62,13 +61,13 @@
 						class="orange-text">Phone Number</label>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col s2">
-				<input type="hidden" name="id" value="${ user.getId() }">
+			
+			<div class="center-align">
+			<input type="hidden" name="id" value="${ user.getId() }">
 					<button class="btn waves-effect waves-light orange" type="submit">
 						Submit <i class="material-icons right">send</i>
 					</button>
-				</div>
+			
 			</div>
 
 		</form>

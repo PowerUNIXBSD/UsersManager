@@ -21,12 +21,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.validator.EmailValidator;
+
 import com.MarkovskiSolutions.Entity.User;
 import com.MarkovskiSolutions.Helpers.ErrorPage;
 
 class UserRowMapper {
-	/**Maps ResultSet row as User object
-	 * 
+	
+	/**
+	 * Maps ResultSet row as User object
 	 * @param rs
 	 * @param user
 	 * @throws SQLException
@@ -40,9 +43,11 @@ class UserRowMapper {
 		user.setPhoneNumber(rs.getString("PhoneNumber"));
 		user.setEMail(rs.getString("EMail"));
 	}
+	
 }
 
 class UserRequestMapper {
+	
 	/**
 	 * Maps HttpRequest as User object
 	 * @param user
@@ -61,13 +66,15 @@ class UserRequestMapper {
 		user.setPhoneNumber(request.getParameter("PhoneNumber"));
 		user.setEMail(request.getParameter("EMail"));
 	}
+	
 }
 
 /**
  * Servlet implementation class UsersServlet
  */
-@WebServlet("/UsersServlet")
+@WebServlet("/users")
 public class UsersServlet extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private Connection con;
 
@@ -76,7 +83,13 @@ public class UsersServlet extends HttpServlet {
 	 */
 	public UsersServlet() {
 		super();
-
+	}
+	
+	/* (non-Javadoc)
+	 * @see javax.servlet.GenericServlet#init()
+	 */
+	@Override
+	public void init() throws ServletException {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = DriverManager.getConnection("jdbc:mysql://putnapomosht-byala.com:3306/putnapo1_usersmanagment",
@@ -84,7 +97,6 @@ public class UsersServlet extends HttpServlet {
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -106,7 +118,6 @@ public class UsersServlet extends HttpServlet {
 			showAllUsers(request, response);
 		}
 
-
 	}
 
 	/**
@@ -122,7 +133,6 @@ public class UsersServlet extends HttpServlet {
 		StringJoiner ids = new StringJoiner(", ");
 		if (usersForDeleteString != null) {
 			
-		
 			for (String sid : usersForDeleteString) {
 				try {
 					
@@ -135,6 +145,7 @@ public class UsersServlet extends HttpServlet {
 				} catch (NumberFormatException ex) {
 					// Skip non-numeric values
 				}
+				
 			}
 			
 			final String sql = "DELETE FROM users WHERE id in (" + ids + ")";
@@ -142,12 +153,12 @@ public class UsersServlet extends HttpServlet {
 				Statement stmt = con.createStatement();
 				response.getWriter().write(sql);
 				stmt.executeUpdate(sql);
-				response.sendRedirect("/UserManagementWebApplication/UsersServlet");
+				response.sendRedirect("users");
 			} catch (SQLException e) {
 				ErrorPage.showError(request, response, e);
 			}
 		} else {
-			response.sendRedirect("/UserManagementWebApplication/UsersServlet");
+			response.sendRedirect("users");
 		}
 	}
 
@@ -161,7 +172,7 @@ public class UsersServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		User user = new User();
-		System.out.println("Real: " + request.getParameter("LastName"));
+		
 		if (request.getParameter("id") != null) {
 			String sql = "SELECT * FROM users WHERE id = ?";
 			try {
@@ -178,8 +189,8 @@ public class UsersServlet extends HttpServlet {
 
 					UserRowMapper.map(rs, user);
 					request.setAttribute("user", user);
-
 					request.getRequestDispatcher("/WEB-INF/users/details.jsp").forward(request, response);
+					
 				}
 
 			} catch (SQLException e) {
@@ -226,9 +237,7 @@ public class UsersServlet extends HttpServlet {
 
 			PreparedStatement stmt = con.prepareStatement(sql);
 			stmt.setString(1, search);
-			stmt.setString(2, search);
-
-			
+			stmt.setString(2, search);		
 			
 			ResultSet rs = stmt.executeQuery();
 
@@ -257,6 +266,7 @@ public class UsersServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
+	@SuppressWarnings({ "deprecation" })
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
@@ -280,6 +290,8 @@ public class UsersServlet extends HttpServlet {
 		
 		if (user.getEMail().isEmpty())
 			errors.add("E-Mail could not be empty!");
+		else if (!EmailValidator.getInstance().isValid(user.getEMail()))
+			errors.add("E-Mail is not valid!");
 		
 		if (errors.length() > 0) {
 			request.setAttribute("user", user);
@@ -295,6 +307,7 @@ public class UsersServlet extends HttpServlet {
 			}
 			
 			try {
+				
 				PreparedStatement stmt = con.prepareStatement(sql);
 				stmt.setString(1, user.getFirstName());
 				stmt.setString(2, user.getLastName());
@@ -307,10 +320,10 @@ public class UsersServlet extends HttpServlet {
 				}
 				
 				stmt.executeUpdate();
-				response.sendRedirect("/UserManagementWebApplication/UsersServlet");
+				response.sendRedirect("users");
+				
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ErrorPage.showError(request, response, e);
 			}
 			
 		}
