@@ -17,40 +17,39 @@
 		</div>
 	</nav>
 	
-	<form method="get">
+	<form method="get" id="searchForm">
 		<div class="row">
 		    <div class="col s12">
 		    
-		  	<div class="">
-		  		<input type="text" name="search" value="${ search }" class=" left-align search orange-text">
-		  		<a href="/UserManagementWebApplication/UsersServlet" title="Search" alt="search"> <i class="material-icons center-text orange-text">search</i> </a>
-		  		<a href="/UserManagementWebApplication/UsersServlet" title="Reset" alt="reset"> <i class="material-icons orange-text">close</i> </a>
-		  	</div>
-		    
-		     
+			  	<div class="">
+			  		<input id="search" type="text" name="search" value="${ search }" class=" left-align search orange-text">
+			  		<button class="btn-flat btn-floating" type="submit"><i class="material-icons center-text orange-text">search</i></button>
+			  		<div id="searchResetBtn" class="btn-flat btn-floating" type="reset"><i class="material-icons center-text orange-text">close</i></div>
+			  	</div>
+			  	
 		    </div>
 	  	</div>
   	</form>
 
-	<form method="get" action="/UserManagementWebApplication/UsersServlet">
+	<form method="get">
 		<table class="bordered marginTop20 marginBottom20">
 			<tr>
 				<th>
-				<a href="">First Name</a> / 
-					<a href="/UserManagementWebApplication/UsersServlet?order=LastName&orderType=${ orderType }&s=${ search }">Last Name</a>
+				<a href="#">First Name</a> / 
+					<a href="/UserManagementWebApplication/UsersServlet?order=LastName&orderType=${ orderType }&search=${ search }">Last Name</a>
 	
 				</th>
 				
-				<th>
-					<a href="">Date of Birth</a>
+				<th class="center-align">
+					<a href="/UserManagementWebApplication/UsersServlet?order=DateBirth&orderType=${ orderType }&search=${ search }">Date of Birth</a>
 				</th>
 				
-				<th>
-					<a href="">Phone number</a>
+				<th class="center-align">
+					<a href="#">Phone number</a>
 				</th>
 				
-				<th>
-					<a href="">E-Mail</a>
+				<th class="center-align">
+					<a href="#">E-Mail</a>
 				</th>
 			</tr>
 	
@@ -62,11 +61,11 @@
 							${ user.getLastName() } </a></label>
 					</td>
 					
-					<td> ${ user.getDateBirth() } </td>
+					<td class="center-align"> ${ user.getDateBirth() } </td>
 					 
-					<td> ${ user.getPhoneNumber() } </td>
+					<td class="center-align"> ${ user.getPhoneNumber() } </td>
 					 
-					<td> ${ user.getEMail() } </td>
+					<td class="left-align"> ${ user.getEMail() } </td>
 					 
 				</tr>
 			</c:forEach>

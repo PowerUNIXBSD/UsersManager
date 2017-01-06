@@ -19,6 +19,10 @@
 			</div>
 		</div>
 	</nav>
+	
+	<div class="">
+		<p class="valign center-align red-text">${ error }</p>
+	</div>
 
 	<div class="row">
 		<form class="col s12" method="post"

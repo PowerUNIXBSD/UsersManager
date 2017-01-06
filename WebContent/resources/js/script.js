@@ -21,7 +21,11 @@ $(function() {
 		} else {
 			$(this).text("Select all");
 		}
-
+	});
+	
+	$("#searchResetBtn").click(function() {
+		$('#search').val("");
+		$('#searchForm').submit();
 	});
 	
 });

@@ -30,6 +30,7 @@ class UserRowMapper {
 	 * @param rs
 	 * @param user
 	 * @throws SQLException
+	 * @throws EmptyFieldException 
 	 */
 	public static void map(ResultSet rs, User user) throws SQLException {
 		user.setId(rs.getInt("id"));
@@ -46,12 +47,17 @@ class UserRequestMapper {
 	 * Maps HttpRequest as User object
 	 * @param user
 	 * @param request
+	 * @throws EmptyFieldException 
 	 */
 	public static void map(User user, HttpServletRequest request) {
 		user.setId(Integer.valueOf(request.getParameter("id")));
 		user.setFirstName(request.getParameter("FirstName"));
 		user.setLastName(request.getParameter("LastName"));
-		user.setDateBirth(Date.valueOf(request.getParameter("DateBirth")));
+		try {
+			user.setDateBirth(Date.valueOf(request.getParameter("DateBirth")));
+		} catch (IllegalArgumentException e) {
+			user.setDateBirth(null);
+		}
 		user.setPhoneNumber(request.getParameter("PhoneNumber"));
 		user.setEMail(request.getParameter("EMail"));
 	}
@@ -135,8 +141,8 @@ public class UsersServlet extends HttpServlet {
 			try {
 				Statement stmt = con.createStatement();
 				response.getWriter().write(sql);
-				/*stmt.executeUpdate(sql);
-				response.sendRedirect("/UserManagementWebApplication/UsersServlet");*/
+				stmt.executeUpdate(sql);
+				response.sendRedirect("/UserManagementWebApplication/UsersServlet");
 			} catch (SQLException e) {
 				ErrorPage.showError(request, response, e);
 			}
@@ -153,8 +159,9 @@ public class UsersServlet extends HttpServlet {
 	 */
 	private void showDetails(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		User user = new User();
-
+		System.out.println("Real: " + request.getParameter("LastName"));
 		if (request.getParameter("id") != null) {
 			String sql = "SELECT * FROM users WHERE id = ?";
 			try {
@@ -165,7 +172,8 @@ public class UsersServlet extends HttpServlet {
 				ResultSet rs = stmt.executeQuery();
 
 				if (!rs.next()) {
-					ErrorPage.show404(request, response);
+					//ErrorPage.show404(request, response);
+					ErrorPage.showError(request, response, "No user with that ID!");
 				} else {
 
 					UserRowMapper.map(rs, user);
@@ -251,34 +259,62 @@ public class UsersServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		User user = new User();
+		
 		UserRequestMapper.map(user, request);
 		
-		final String sql;
-		if (user.getId() != 0) {
-			sql = "UPDATE users SET FirstName = ?, LastName = ?, DateBirth = ?, PhoneNumber = ?, EMail = ? WHERE id = ?";
-		} else {
-			sql = "INSERT INTO users(FirstName, LastName, DateBirth, PhoneNumber, EMail) VALUES(?, ?, ?, ?, ?)";
-		}
+		StringJoiner errors = new StringJoiner("<br>");
 		
-		try {
-			PreparedStatement stmt = con.prepareStatement(sql);
-			stmt.setString(1, user.getFirstName());
-			stmt.setString(2, user.getLastName());
-			stmt.setDate(3, user.getDateBirth());
-			stmt.setString(4, user.getPhoneNumber());
-			stmt.setString(5, user.getEMail());
-			
+		if (user.getFirstName().isEmpty())
+			errors.add("First name could not be empty!");
+		
+		if (user.getLastName().isEmpty())
+			errors.add("Last name could not be empty!");
+		
+		if (user.getDateBirth() == null)
+			errors.add("Date of Birth could not be empty!");
+		
+		if (user.getPhoneNumber().isEmpty())
+			errors.add("Phone number could not be empty!");
+		
+		if (user.getEMail().isEmpty())
+			errors.add("E-Mail could not be empty!");
+		
+		if (errors.length() > 0) {
+			request.setAttribute("user", user);
+			request.setAttribute("error", errors.toString());
+			request.getRequestDispatcher("/WEB-INF/users/details.jsp").forward(request, response);
+		} else {
+		
+			final String sql;
 			if (user.getId() != 0) {
-				stmt.setInt(6, user.getId());
+				sql = "UPDATE users SET FirstName = ?, LastName = ?, DateBirth = ?, PhoneNumber = ?, EMail = ? WHERE id = ?";
+			} else {
+				sql = "INSERT INTO users(FirstName, LastName, DateBirth, PhoneNumber, EMail) VALUES(?, ?, ?, ?, ?)";
 			}
 			
-			stmt.executeUpdate();
-			response.sendRedirect("/UserManagementWebApplication/UsersServlet");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				PreparedStatement stmt = con.prepareStatement(sql);
+				stmt.setString(1, user.getFirstName());
+				stmt.setString(2, user.getLastName());
+				stmt.setDate(3, user.getDateBirth());
+				stmt.setString(4, user.getPhoneNumber());
+				stmt.setString(5, user.getEMail());
+				
+				if (user.getId() != 0) {
+					stmt.setInt(6, user.getId());
+				}
+				
+				stmt.executeUpdate();
+				response.sendRedirect("/UserManagementWebApplication/UsersServlet");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
+		
 	}
 
 }

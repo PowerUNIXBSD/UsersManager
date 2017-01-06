@@ -34,6 +34,7 @@ public class User {
 	
 	/**
 	 * @param firstName the firstName to set
+	 * @throws EmptyFieldException 
 	 */
 	public void setFirstName(String firstName) {
 		FirstName = firstName;
